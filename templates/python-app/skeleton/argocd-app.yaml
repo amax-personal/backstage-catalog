@@ -1,0 +1,19 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: ${{ values.name }}
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/amax-personal/${{ values.name }}
+    targetRevision: HEAD
+    path: helm
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: ${{ values.name }}
+  # --- 手动模式配置 ---
+  syncPolicy:
+    manual: {} # 明确标记为手动（或者直接不写 syncPolicy）
+    syncOptions:
+      - CreateNamespace=true

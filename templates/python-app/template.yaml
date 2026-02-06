@@ -47,7 +47,12 @@ spec:
       action: publish:github
       input:
         repoUrl: 'github.com?owner=amax-personal&repo=${{ parameters.name }}'
+        repoVisibility: public
         defaultBranch: main
+        # 关键点：打上标签，让 ArgoCD 的 ApplicationSet 只扫描这些仓库
+        topics:
+          - backstage
+          - internal-tool
 
     - id: register
       name: 注册到 Backstage
