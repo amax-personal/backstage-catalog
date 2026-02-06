@@ -1,0 +1,57 @@
+apiVersion: scaffold.backstage.io/v1beta3
+kind: Template
+metadata:
+  name: python-app-template
+  title: Python Application
+  description: 自动创建仓库、配置 GitHub Actions 推送到阿里云并更新 ArgoCD
+spec:
+  owner: catalyst
+  type: service
+
+  parameters:
+    - title: Configuration
+      required: [name, owner]
+      properties:
+        name:
+          title: application name
+          type: string
+          description: 对应 GitHub 仓库名
+        owner:
+          title: Owner
+          type: string
+          ui:field: OwnerPicker
+          ui:options:
+            catalogFilter:
+              kind: [Group]
+
+  steps:
+    - id: template
+      name: 生成代码骨架
+      action: fetch:template
+      input:
+        url: ./skeleton
+        values:
+          name: ${{ parameters.name }}
+          owner: ${{ parameters.owner }}
+          # 这里可以预设你的阿里云仓库前缀
+          imageRepo: registry.cn-shanghai.aliyuncs.com/amax-personal/${{ parameters.name }}
+
+    - id: publish
+      name: 发布到 GitHub (amax-personal 组织)
+      action: publish:github
+      input:
+        allowedHosts: ['github.com']
+        repoUrl: 'github.com?owner=amax-personal&repo=${{ parameters.name }}'
+        defaultBranch: main
+
+    - id: register
+      name: 注册到 Backstage
+      action: catalog:register
+      input:
+        repoContentsUrl: ${{ steps['publish'].output.remoteUrl }}
+        catalogInfoPath: '/catalog-info.yaml'
+
+  output:
+    links:
+      - title: 查看新仓库
+        url: ${{ steps['publish'].output.remoteUrl }}
