@@ -16,6 +16,10 @@ spec:
           title: application name
           type: string
           description: 对应 GitHub 仓库名
+        desc:
+          title: application description
+          type: string
+          description: Application description
         owner:
           title: Owner
           type: string
@@ -32,9 +36,11 @@ spec:
         url: ./skeleton
         values:
           name: ${{ parameters.name }}
+          desc: ${{ parameters.desc }}
           owner: ${{ parameters.owner }}
-          # 这里可以预设你的阿里云仓库前缀
-          imageRepo: registry.cn-shanghai.aliyuncs.com/amax-personal/${{ parameters.name }}
+          # 修正为你的个人版实际地址
+          registry: crpi-zwbmpse5bz48kucd.cn-shanghai.personal.cr.aliyuncs.com
+          imageRepo: crpi-zwbmpse5bz48kucd.cn-shanghai.personal.cr.aliyuncs.com/amaxzhong/${{ parameters.name }}
 
     - id: publish
       name: 发布到 GitHub (amax-personal 组织)

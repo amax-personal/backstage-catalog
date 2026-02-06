@@ -21,8 +21,9 @@ def details():
         'os': platform.system(),
         'python_version': platform.python_version(),
         
-        # 4. 环境变量 (可以确认你的 ConfigMap 或 Secret 是否生效)
-        'env_app_version': os.getenv('APP_VERSION', 'unknown')
+        # 4. app info
+        'application': "${{ values.name | dump }}", 
+        'owner': "${{ values.owner | dump }}"
     })
 
 @app.route('/api/v1/healthy')
