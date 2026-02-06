@@ -17,18 +17,19 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          # 必须设置为 0 以获取完整的 git 历史，否则 rev-parse 可能失败
           fetch-depth: 0
 
       - name: Set Short SHA
         id: vars
-        # 使用 {% raw %} 保护 GitHub Actions 的语法不被 Backstage 提前解析
+        # No raw needed here for the shell command itself, 
+        # but keep it if you want to be extra safe with GHA syntax
         run: echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
 
       - name: Log in to Aliyun ACR
         uses: docker/login-action@v3
         with:
-          registry: ${{ values.registry | dump }}
+          # REMOVED | dump - Backstage will insert the plain string here
+          registry: ${{ values.registry }}
           username: {% raw %}${{ secrets.ACR_USERNAME }}{% endraw %}
           password: {% raw %}${{ secrets.ACR_PASSWORD }}{% endraw %}
 
@@ -38,25 +39,23 @@ jobs:
           context: .
           push: true
           tags: |
-            ${{ values.imageRepo | dump }}:latest
-            ${{ values.imageRepo | dump }}:{% raw %}${{ env.sha_short }}{% endraw %}
+            ${{ values.imageRepo }}:latest
+            ${{ values.imageRepo }}:{% raw %}${{ env.sha_short }}{% endraw %}
 
       - name: Update Helm Image Tag
         run: |
-          # 检查文件是否存在
           if [ ! -f helm/values.yaml ]; then
             echo "Error: helm/values.yaml not found!"
             exit 1
           fi
 
-          # 使用 yq 更新 tag
-          # 注意：这里的 env.sha_short 是 GitHub Actions 的变量，需要包裹在 raw 中
+          # Use double quotes for the yq command so the shell 
+          # correctly interprets the GHA variable after generation
           yq -i '.image.tag = "{% raw %}${{ env.sha_short }}{% endraw %}"' helm/values.yaml
 
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
           git add helm/values.yaml
-          # 提交信息中也需要保护环境变量
           git commit -m "chore: update image tag to {% raw %}${{ env.sha_short }}{% endraw %} [skip ci]"
           git push
