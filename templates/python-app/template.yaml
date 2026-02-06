@@ -46,7 +46,6 @@ spec:
       name: 发布到 GitHub (amax-personal 组织)
       action: publish:github
       input:
-        allowedHosts: ['github.com']
         repoUrl: 'github.com?owner=amax-personal&repo=${{ parameters.name }}'
         defaultBranch: main
 
