@@ -22,8 +22,8 @@ def details():
         'python_version': platform.python_version(),
         
         # 4. app info
-        'application': "${{ values.name | dump }}", 
-        'owner': "${{ values.owner | dump }}"
+        'application': "${{ values.name }}", 
+        'owner': "${{ values.owner }}"
     })
 
 @app.route('/api/v1/healthy')
