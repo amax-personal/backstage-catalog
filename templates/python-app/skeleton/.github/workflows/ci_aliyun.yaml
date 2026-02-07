@@ -42,20 +42,20 @@ jobs:
             ${{ values.imageRepo }}:latest
             ${{ values.imageRepo }}:{% raw %}${{ env.sha_short }}{% endraw %}
 
-      - name: Update Helm Image Tag
-        run: |
-          if [ ! -f helm/values.yaml ]; then
-            echo "Error: helm/values.yaml not found!"
-            exit 1
-          fi
+      # - name: Update Helm Image Tag
+      #   run: |
+          # if [ ! -f helm/values.yaml ]; then
+          #   echo "Error: helm/values.yaml not found!"
+          #   exit 1
+          # fi
 
-          # Use double quotes for the yq command so the shell 
-          # correctly interprets the GHA variable after generation
-          yq -i '.image.tag = "{% raw %}${{ env.sha_short }}{% endraw %}"' helm/values.yaml
+          # # Use double quotes for the yq command so the shell 
+          # # correctly interprets the GHA variable after generation
+          # yq -i '.image.tag = "{% raw %}${{ env.sha_short }}{% endraw %}"' helm/values.yaml
 
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          # git config --global user.name "github-actions[bot]"
+          # git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
-          git add helm/values.yaml
-          git commit -m "chore: update image tag to {% raw %}${{ env.sha_short }}{% endraw %} [skip ci]"
-          git push
+          # git add helm/values.yaml
+          # git commit -m "chore: update image tag to {% raw %}${{ env.sha_short }}{% endraw %} [skip ci]"
+          # git push
